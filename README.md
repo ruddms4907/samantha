@@ -51,7 +51,7 @@ AI Companion 서비스. 사용자와 지속적으로 대화하며 서로를 알�
 
 | 문서 | 내용 | 상태 |
 |---|---|---|
-| `CLAUDE.md` | AI 협업 및 개발 규칙 | ⬜ 예정 |
+| `CLAUDE.md` | AI 협업 및 개발 규칙 | ✅ 작성됨 |
 | `docs/PRODUCT.md` | 무엇을, 누구에게, 왜 만드는가 | ✅ 작성됨 |
 | `docs/ARCHITECTURE.md` | 시스템 구조와 데이터 흐름 | ⬜ 예정 |
 | `docs/DATABASE.md` | 테이블 설계, RLS, 마이그레이션 규칙 | ⬜ 예정 |
