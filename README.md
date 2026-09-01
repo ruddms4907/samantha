@@ -28,8 +28,8 @@ AI Companion 서비스. 사용자와 지속적으로 대화하며 서로를 알�
 ## 기술 스택
 
 - **앱**: React Native + Expo (Development Build), TypeScript (strict)
-- **백엔드**: 별도 서버 계층 (AI API Key 보관 및 호출 담당)
-- **데이터**: Supabase (Postgres + Auth + RLS + pgvector)
+- **백엔드**: 독립 백엔드 애플리케이션 (서버 측 비즈니스 로직 — AI 대화, 기억, 관계, 결제 검증, 알림)
+- **데이터**: Supabase (PostgreSQL + Auth + RLS)
 - **형상관리**: Git / GitHub
 
 ## 확정된 원칙 (변경하려면 결정 기록을 남길 것)
@@ -53,12 +53,12 @@ AI Companion 서비스. 사용자와 지속적으로 대화하며 서로를 알�
 |---|---|---|
 | `CLAUDE.md` | AI 협업 및 개발 규칙 | ✅ 작성됨 |
 | `docs/PRODUCT.md` | 무엇을, 누구에게, 왜 만드는가 | ✅ 작성됨 |
-| `docs/ARCHITECTURE.md` | 시스템 구조와 데이터 흐름 | ⬜ 예정 |
+| `docs/ARCHITECTURE.md` | 시스템 구조와 데이터 흐름 | ✅ 작성됨 |
 | `docs/DATABASE.md` | 테이블 설계, RLS, 마이그레이션 규칙 | ⬜ 예정 |
 | `docs/SECURITY.md` | 키 관리와 금지 사항 | ⬜ 예정 |
 | `docs/SAFETY.md` | AI 안전, 위기 대응, 연령 정책 | ⬜ 예정 |
 | `docs/AI_SYSTEM.md` | 모델, 프롬프트, 기억 파이프라인 | ⬜ 예정 |
-| `docs/DECISIONS/` | 기술 결정 기록 (선택지·장단점·이유) | ⬜ 예정 |
+| `docs/DECISIONS/` | 기술 결정 기록 (선택지·장단점·이유) | ✅ 0001 작성됨 |
 
 ---
 
