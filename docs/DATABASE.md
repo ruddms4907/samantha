@@ -12,7 +12,7 @@
 |---|---|---|
 | 1 | 기본 규칙 (2~9장) | ✅ 완료 |
 | 2 | 계정 영역 (10장) | ✅ 완료 |
-| 3 | Companion 영역 | ⬜ 예정 |
+| 3 | Companion 영역 (11장) | ✅ 완료 |
 | 4 | 대화와 기억 | ⬜ 예정 |
 | 5 | 운영 영역 및 삭제 정책 | ⬜ 예정 |
 
@@ -239,9 +239,142 @@
 
 ---
 
-## 11. 변경 이력
+## 11. Companion 영역
+
+### 11.1 격리 구조
+
+두 Companion 의 데이터가 섞이지 않게 하는 방법은 **코드의 주의가 아니라 구조**다.
+
+```
+user_profiles
+     │
+     ├──► user_companions  (사용자 A × 남성)   ← 하나의 "관계"
+     │           ▲
+     │           └── 대화 · 기억 · 관계 이력이 전부 여기에 붙는다
+     │
+     └──► user_companions  (사용자 A × 여성)   ← 완전히 다른 "관계"
+                 ▲
+                 └── 위와 공유되는 데이터가 하나도 없다
+```
+
+- **대화와 기억 테이블은 `user_id` 를 직접 갖지 않는다. `user_companion_id` 만 갖는다.**
+- 따라서 "사용자의 모든 대화"를 Companion 구분 없이 조회하는 것이 **구조적으로 불가능하다.**
+- 두 Companion 의 데이터를 합치는 뷰나 함수를 만들지 않는다.
+
+---
+
+### 11.2 `companion_templates`
+
+Companion 의 원본 정의. **전체에 2행만 존재한다.** (남성 1, 여성 1)
+사용자별로 복제하지 않는다.
+
+| 컬럼 | 타입 | 필수 | 설명 |
+|---|---|---|---|
+| `id` | `uuid` | ✔ | 기본 키 |
+| `gender` | `text` | ✔ | `male` / `female` |
+| `base_persona` | `text` | ✔ | 기본 성격 정의. AI 프롬프트의 재료 |
+| `is_enabled` | `boolean` | ✔ | 신규 활성화 허용 여부 |
+| `created_at` / `updated_at` | `timestamptz` | ✔ | 공통 컬럼 |
+
+**규칙**
+
+- **`base_persona` 를 코드에 두지 않는다.** 이 테이블에 둔다.
+  (`ARCHITECTURE.md` 5장 — 운영 데이터와 코드의 분리)
+  코드에 두면 문구 하나 고치는 데 앱 심사를 다시 받아야 한다.
+- 값 변경은 운영자만 할 수 있으며, 변경 이력은 감사 로그로 남긴다. (조각 5)
+- `is_enabled = false` 는 **신규 활성화만 막는다.**
+  이미 존재하는 관계 데이터는 그대로 보존한다.
+
+---
+
+### 11.3 `user_companions` — 이 설계의 중심
+
+사용자 한 명당 **2행**(남/여)이 생긴다.
+**대화·기억·관계 이력은 모두 이 테이블의 `id` 를 참조한다.**
+
+| 컬럼 | 타입 | 필수 | 설명 |
+|---|---|---|---|
+| `id` | `uuid` | ✔ | 기본 키. **모든 대화·기억이 이 값을 참조한다** |
+| `user_id` | `uuid` | ✔ | `user_profiles.id` 참조 |
+| `template_id` | `uuid` | ✔ | `companion_templates.id` 참조 |
+| `companion_name` | `text` | ✔ | 사용자가 지은 이름 |
+| `is_active` | `boolean` | ✔ | 활성 여부. **계정당 1개만 `true`** |
+| `relationship_stage` | `smallint` | ✔ | 1 낯섦 ~ 5 깊은 관계 |
+| `intimacy_score` | `integer` | ✔ | 내부 친밀도. **사용자에게 노출하지 않는다** |
+| `stage_changed_at` | `timestamptz` | | 마지막 단계 변경 시각 |
+| `total_interaction_days` | `integer` | ✔ | 대화한 날짜의 수 (연속일이 아님) |
+| `last_interacted_at` | `timestamptz` | | 마지막 대화 시각 |
+| `activated_at` | `timestamptz` | | 마지막으로 활성화된 시각 |
+| `created_at` / `updated_at` | `timestamptz` | ✔ | 공통 컬럼 |
+
+**데이터베이스 제약 (사람의 주의력에 의존하지 않는다)**
+
+| 제약 | 목적 |
+|---|---|
+| `(user_id, template_id)` 유일 | 같은 Companion 이 두 개 생기지 않게 |
+| `user_id` 부분 유니크 (`is_active = true` 인 행만) | **계정당 활성 Companion 을 1명으로 강제** |
+| `relationship_stage` 는 1~5 | 잘못된 단계 값 차단 |
+| 사용자 삭제 시 함께 삭제 | 계정 삭제 시 관계 데이터가 남지 않게 |
+
+두 번째 제약이 핵심이다. 백엔드 코드에 실수가 있어도 **데이터베이스가 거부한다.**
+
+**규칙**
+
+- **`companion_name` 은 사용자가 입력한다.** 부적절한 이름의 처리는 `docs/SAFETY.md` 에서 정한다.
+- **`intimacy_score` 는 앱 응답에 포함하지 않는다.** 사용자는 말투와 태도의 변화로만 관계를 인지한다.
+- `relationship_stage` 와 `intimacy_score` 는 **백엔드만 변경한다.** 앱이 보낸 값을 신뢰하지 않는다.
+- 비활성 기간은 관계 후퇴 판정에 반영하지 않는다. (`PRODUCT.md` 4.4)
+  판정 시 `last_interacted_at` 과 `activated_at` 을 함께 본다.
+- `total_interaction_days` 는 **대화한 날짜의 수**다. 연속 접속일이 아니다.
+  관계 상승의 "지속성" 판정에 쓴다. (`PRODUCT.md` 5.1)
+
+---
+
+### 11.4 `relationship_events`
+
+관계 단계가 바뀔 때마다 행을 추가한다. **덮어쓰지 않는다.**
+
+| 컬럼 | 타입 | 필수 | 설명 |
+|---|---|---|---|
+| `id` | `uuid` | ✔ | 기본 키 |
+| `user_companion_id` | `uuid` | ✔ | 어느 관계에서 일어난 일인지 |
+| `from_stage` | `smallint` | ✔ | 변경 전 단계 |
+| `to_stage` | `smallint` | ✔ | 변경 후 단계 |
+| `trigger` | `text` | ✔ | `user_choice` / `system` |
+| `occurred_at` | `timestamptz` | ✔ | 발생 시각 |
+| `created_at` | `timestamptz` | ✔ | 공통 컬럼 |
+
+**규칙**
+
+- **3단계 → 4단계(썸 → 연인) 변경은 `trigger` 가 반드시 `user_choice` 여야 한다.**
+  AI 가 사용자 동의 없이 관계를 진전시키지 않는다. (`PRODUCT.md` 5.1)
+- 수정되지 않는 기록성 테이블이므로 `updated_at` 을 두지 않는다. (3장 예외)
+- 이 기록으로 "언제 어떻게 관계가 바뀌었는지"를 사후에 확인할 수 있다.
+
+---
+
+### 11.5 접근 통제
+
+- 세 테이블 모두 RLS 활성화, **기본 전부 차단**. (7장)
+- 앱을 위한 허용 정책을 만들지 않는다. 백엔드만 `service_role` 로 접근한다.
+
+---
+
+### 11.6 이 조각에서 다루지 않은 것
+
+| 항목 | 다루는 곳 |
+|---|---|
+| 관계 단계에 따라 성격과 말투가 어떻게 변하는지 | `docs/AI_SYSTEM.md` |
+| 친밀도 계산식, 단계 상승 조건의 구체적 기준 | `docs/AI_SYSTEM.md` |
+| Companion 이름의 부적절 입력 처리 | `docs/SAFETY.md` |
+| 대화와 기억 테이블 | 조각 4 |
+
+---
+
+## 12. 변경 이력
 
 | 날짜 | 내용 |
 |---|---|
 | 2026-09-02 | 조각 1 작성 — 기본 규칙. ID 는 UUID, 삭제는 실제 삭제 기본 |
 | 2026-09-02 | 조각 2 작성 — 계정 영역. 생년월일 미저장, 동의 기록 IP 미수집 |
+| 2026-09-02 | 조각 3 작성 — Companion 영역. 활성 1명을 DB 제약으로 강제, 친밀도 비노출 |
