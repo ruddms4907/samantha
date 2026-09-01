@@ -29,6 +29,7 @@ AI Companion 서비스. 사용자와 지속적으로 대화하며 서로를 알�
 
 - **앱**: React Native + Expo (Development Build), TypeScript (strict)
 - **백엔드**: 독립 백엔드 애플리케이션 (서버 측 비즈니스 로직 — AI 대화, 기억, 관계, 결제 검증, 알림)
+- **관리자 화면**: Admin Console (Web) — 운영 설정 변경용. **미구현, 구조상 자리만 확보**
 - **데이터**: Supabase (PostgreSQL + Auth + RLS)
 - **형상관리**: Git / GitHub
 
