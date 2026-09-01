@@ -59,7 +59,7 @@ AI Companion 서비스. 사용자와 지속적으로 대화하며 서로를 알�
 | `docs/SECURITY.md` | 키 관리와 금지 사항 | ⬜ 예정 |
 | `docs/SAFETY.md` | AI 안전, 위기 대응, 연령 정책 | ⬜ 예정 |
 | `docs/AI_SYSTEM.md` | 모델, 프롬프트, 기억 파이프라인 | ⬜ 예정 |
-| `docs/DECISIONS/` | 기술 결정 기록 (선택지·장단점·이유) | ✅ 0001 작성됨 |
+| `docs/DECISIONS/` | 기술 결정 기록 (선택지·장단점·이유) | ✅ 0001, 0002 |
 
 ---
 
