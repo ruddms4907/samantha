@@ -57,7 +57,7 @@ AI Companion 서비스. 사용자와 지속적으로 대화하며 서로를 알�
 | `docs/ARCHITECTURE.md` | 시스템 구조와 데이터 흐름 | ✅ 작성됨 |
 | `docs/DATABASE.md` | 테이블 설계, RLS, 마이그레이션 규칙 | ✅ 작성됨 |
 | `docs/SECURITY.md` | 키 관리와 금지 사항 | ⬜ 예정 |
-| `docs/SAFETY.md` | AI 안전, 위기 대응, 연령 정책 | ⬜ 예정 |
+| `docs/SAFETY.md` | AI 안전, 위기 대응, 연령 정책 | ✅ 작성됨 |
 | `docs/AI_SYSTEM.md` | 모델, 프롬프트, 기억 파이프라인 | ⬜ 예정 |
 | `docs/DECISIONS/` | 기술 결정 기록 (선택지·장단점·이유) | ✅ 0001, 0002 |
 
