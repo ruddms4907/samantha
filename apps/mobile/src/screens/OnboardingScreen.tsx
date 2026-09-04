@@ -1,4 +1,5 @@
 import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useRouter } from 'expo-router';
 
 import { t } from '../i18n';
 
@@ -8,6 +9,8 @@ import { t } from '../i18n';
  * (이미지에 글자를 박으면 문구 변경과 다국어 대응이 불가능해진다)
  */
 export function OnboardingScreen() {
+  const router = useRouter();
+
   return (
     <ImageBackground
       source={require('../../assets/onboarding-bg.png')}
@@ -26,6 +29,7 @@ export function OnboardingScreen() {
 
         <Pressable
           accessibilityRole="button"
+          onPress={() => router.push('/companion-select')}
           style={({ pressed }) => [styles.startButton, pressed && styles.startButtonPressed]}
         >
           <Text style={styles.startLabel}>{t('onboarding.start')}</Text>
