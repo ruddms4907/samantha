@@ -12,9 +12,9 @@ AI Companion 서비스. 사용자와 지속적으로 대화하며 서로를 알�
 
 | Phase | 내용 | 상태 |
 |---|---|---|
-| 0 | 개발 도구 설치 | ⬜ 예정 |
-| 1 | 저장소 + 핵심 문서 | 🟨 진행 중 |
-| 2 | 앱 껍데기 + 개발 규칙 (Expo/TS/CI) | ⬜ |
+| 0 | 개발 도구 설치 | ✅ 완료 |
+| 1 | 저장소 + 핵심 문서 | ✅ 완료 |
+| 2 | 앱 껍데기 + 개발 규칙 (Expo/TS/CI) | 🟨 진행 중 |
 | 3 | 인증 + DB 스키마 v1 + RLS | ⬜ |
 | 4 | AI 대화 (서버 경유) | ⬜ |
 | 5 | 장기 기억 시스템 | ⬜ |
@@ -53,16 +53,47 @@ AI Companion 서비스. 사용자와 지속적으로 대화하며 서로를 알�
 | 문서 | 내용 | 상태 |
 |---|---|---|
 | `CLAUDE.md` | AI 협업 및 개발 규칙 | ✅ 작성됨 |
+| `docs/DEVELOPMENT.md` | 개발 환경 세팅, 실행, 자주 나는 오류 | ✅ 작성됨 |
 | `docs/PRODUCT.md` | 무엇을, 누구에게, 왜 만드는가 | ✅ 작성됨 |
 | `docs/ARCHITECTURE.md` | 시스템 구조와 데이터 흐름 | ✅ 작성됨 |
 | `docs/DATABASE.md` | 테이블 설계, RLS, 마이그레이션 규칙 | ✅ 작성됨 |
 | `docs/SECURITY.md` | 키 관리와 금지 사항 | ✅ 작성됨 |
 | `docs/SAFETY.md` | AI 안전, 위기 대응, 연령 정책 | ✅ 작성됨 |
 | `docs/AI_SYSTEM.md` | 모델, 프롬프트, 기억 파이프라인 | ⬜ 예정 |
-| `docs/DECISIONS/` | 기술 결정 기록 (선택지·장단점·이유) | ✅ 0001, 0002 |
+| `docs/DECISIONS/` | 기술 결정 기록 (선택지·장단점·이유) | ✅ 0001~0003 |
 
 ---
 
 ## 개발 시작하기
 
-아직 실행할 코드가 없습니다. Phase 2에서 이 항목을 채웁니다.
+**처음 세팅하거나 빌드가 안 되면 `docs/DEVELOPMENT.md` 를 먼저 본다.**
+겪었던 오류와 해결법이 전부 거기에 있다.
+
+```bash
+cd apps/mobile
+npm install
+npx expo run:ios --device     # 아이폰 실기기에 설치 + 실행
+```
+
+이미 설치되어 있다면 개발 서버만 켜면 된다.
+
+```bash
+cd apps/mobile
+npx expo start --dev-client
+```
+
+올리기 전 검사:
+
+```bash
+npm run typecheck && npm run lint && npm run format:check
+```
+
+### 현재 구현된 화면
+
+| 주소 | 화면 |
+|---|---|
+| `/` | 시작 (Him / Her) |
+| `/companion-select` | Companion 선택 (Him / Her) |
+| `/companion-name` | 이름 짓기 |
+
+> 아직 **계정과 데이터베이스가 없어서 선택한 내용이 저장되지 않는다.** (Phase 3)
