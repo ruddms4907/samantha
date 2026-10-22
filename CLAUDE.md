@@ -10,7 +10,8 @@
 **Samantha** — 나를 기억하고, 시간이 지날수록 관계가 깊어지는 AI Companion 앱.
 iOS / Android 상용 서비스. 한국 출시 후 해외 확장을 고려한다.
 
-- 현재 단계: **Phase 1 — 프로젝트 기반 설계** (앱 코드 없음)
+- 현재 단계: **Phase 3 — 계정 + DB 스키마 + RLS**
+  (Phase 0~2 완료: 문서, 앱 껍데기, 온보딩 화면 3개가 실제 기기에서 동작한다. 아직 저장 기능은 없다.)
 - 진행 상황은 `README.md` 의 Phase 표를 본다.
 
 ---
@@ -152,12 +153,14 @@ Samantha는 실제 App Store와 Google Play에 출시할 상용 모바일 앱이
 
 ## 코드 규칙
 
-> Phase 2(앱 껍데기)에서 구체화한다. 현재 확정된 것만 적는다.
-
 - TypeScript `strict` 모드를 사용한다. `any` 를 쓰지 않는다.
 - 사용자에게 보이는 문자열을 코드에 직접 쓰지 않는다.
-  다국어 확장을 위해 키로 관리한다.
+  `apps/mobile/src/i18n/` 의 사전에 키로 등록하고 `t()` 로 꺼내 쓴다.
 - 개발 / 운영 환경을 분리한다. 환경변수 이름은 `.env.example` 에만 적는다.
+- 화면 이동은 expo-router 를 쓴다. `app/` 의 파일은 얇게 두고
+  실제 화면은 `src/screens/` 에 둔다. (`docs/DECISIONS/0003`)
+- 커밋 전에 `npm run typecheck` 와 `npm run lint` 가 통과해야 한다.
+  GitHub Actions 가 같은 검사를 다시 돌린다.
 
 ---
 
